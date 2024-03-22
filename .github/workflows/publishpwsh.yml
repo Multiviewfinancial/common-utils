@@ -8,12 +8,13 @@ on:
       - master
 
 env:
-  PACKAGE: test
-  PACKAGE_VERSION: 1.0.0
+  PACKAGE: powershell_scripts
+  PACKAGE_VERSION: 1.0.0.${{ github.run_number }}${{ github.ref_name == 'master' && '' || format('-{0}',github.ref_name) }}
       
 jobs:
   zip-and-publish:
     runs-on: windows-latest
+    environment: Multiview1
     steps:
       - uses: actions/checkout@v3
 
@@ -28,7 +29,14 @@ jobs:
         run: Compress-Archive -Path pwsh_scripts -DestinationPath package.zip
         shell: pwsh
 
+      - name: Generate Hash
+        id: hash
+        run: |
+          $asset_sha = (Get-FileHash package.zip).Hash.ToLower()
+          echo "ASSET_SHA=$asset_sha" | Out-File -FilePath $env:GITHUB_ENV -Append
+        shell: pwsh
+
       - name: Publish the package version to AWS CodeArtifact
         run: |
-          aws codeartifact publish-package-version --domain ${{ env.CODEARTIFACT_DOMAIN }} --domain-owner ${{ env.CODEARTIFACT_DOMAIN_OWNER }} --repository ${{ secrets.AWS_ACCESS_KEY_ID }} --format generic --namespace ${{ env.CODEARTIFACT_NAMESPACE }} --package $PACKAGE --package-version $PACKAGE_VERSION --asset package.zip --asset-name package.zip
+          aws codeartifact publish-package-version --domain ${{ vars.CODEARTIFACT_DOMAIN }} --domain-owner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} --repository ${{ vars.CODEARTIFACT_REPOSITORY }} --format generic --namespace ${{ vars.CODEARTIFACT_NAMESPACE }} --package $env:PACKAGE --package-version $env:PACKAGE_VERSION --asset-content package.zip --asset-name package.zip --asset-sha256 $env:ASSET_SHA
         shell: pwsh
