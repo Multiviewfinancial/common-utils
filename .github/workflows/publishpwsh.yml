@@ -1,0 +1,34 @@
+# This is a basic workflow to help you get started with Actions
+
+name: Publish Powershell Utils
+# Controls when the workflow will run
+on:
+  push:
+    branches:
+      - master
+
+env:
+  PACKAGE: test
+  PACKAGE_VERSION: 1.0.0
+      
+jobs:
+  zip-and-publish:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
+
+      - name: Zip the folder
+        run: Compress-Archive -Path pwsh_scripts -DestinationPath package.zip
+        shell: pwsh
+
+      - name: Publish the package version to AWS CodeArtifact
+        run: |
+          aws codeartifact publish-package-version --domain ${{ env.CODEARTIFACT_DOMAIN }} --domain-owner ${{ env.CODEARTIFACT_DOMAIN_OWNER }} --repository ${{ secrets.AWS_ACCESS_KEY_ID }} --format generic --namespace ${{ env.CODEARTIFACT_NAMESPACE }} --package $PACKAGE --package-version $PACKAGE_VERSION --asset package.zip --asset-name package.zip
+        shell: pwsh
