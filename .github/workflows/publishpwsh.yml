@@ -9,7 +9,7 @@ on:
 
 env:
   PACKAGE: powershell_scripts
-  PACKAGE_VERSION: 1.0.0.${{ github.run_number }}${{ github.ref_name == 'master' && '' || format('-{0}',github.ref_name) }}
+  PACKAGE_VERSION: 1.0.${{ github.run_number }}
       
 jobs:
   zip-and-publish:
@@ -26,17 +26,17 @@ jobs:
           aws-region: us-east-1
 
       - name: Zip the folder
-        run: Compress-Archive -Path pwsh_scripts -DestinationPath package.zip
+        run: Compress-Archive -Path pwsh_scripts -DestinationPath package-$env:PACKAGE_VERSION.zip
         shell: pwsh
 
       - name: Generate Hash
         id: hash
         run: |
-          $asset_sha = (Get-FileHash package.zip).Hash.ToLower()
+          $asset_sha = (Get-FileHash package-$env:PACKAGE_VERSION.zip).Hash.ToLower()
           echo "ASSET_SHA=$asset_sha" | Out-File -FilePath $env:GITHUB_ENV -Append
         shell: pwsh
 
       - name: Publish the package version to AWS CodeArtifact
         run: |
-          aws codeartifact publish-package-version --domain ${{ vars.CODEARTIFACT_DOMAIN }} --domain-owner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} --repository ${{ vars.CODEARTIFACT_REPOSITORY }} --format generic --namespace ${{ vars.CODEARTIFACT_NAMESPACE }} --package $env:PACKAGE --package-version $env:PACKAGE_VERSION --asset-content package.zip --asset-name package.zip --asset-sha256 $env:ASSET_SHA
+          aws codeartifact publish-package-version --domain ${{ vars.CODEARTIFACT_DOMAIN }} --domain-owner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} --repository ${{ vars.CODEARTIFACT_REPOSITORY }} --format generic --namespace ${{ vars.CODEARTIFACT_NAMESPACE }} --package $env:PACKAGE --package-version $env:PACKAGE_VERSION --asset-content package-$env:PACKAGE_VERSION.zip --asset-name package-$env:PACKAGE_VERSION.zip --asset-sha256 $env:ASSET_SHA
         shell: pwsh
