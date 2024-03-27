@@ -29,7 +29,7 @@ on:
         options: 
         - DevStaging-Windows
         - QAAuto-Windows
-        - QAStaging-Windowsqa-staging
+        - QAStaging-Windows
         - UE1-DEV-01
       codeArtifactPackageVersion:
         description: "Version of the CodeArtifact package e.g. 1.0.21 (to be removed once Parameter Store is properly configured for this)"
@@ -55,7 +55,7 @@ jobs:
         aws-region: us-east-1
     
     - name: Call Bootstrap SSM Doc
-      run:  .\RunBootstrapSSMDoc.ps1 -vmName ${{ github.event.inputs.targetEnvironmentName }} -fileName package-${{ github.event.inputs.codeArtifactPackageVersion }} -domainOwner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} -nameSpace ${{ vars.CODEARTIFACT_NAMESPACE }} -package ${{ vars.CODEARTIFACT_PACKAGE_NAME }} -packageVersion ${{ github.event.inputs.codeArtifactPackageVersion }} -repository ${{ vars.CODEARTIFACT_REPOSITORY }} -scriptToRun ${{ github.event.inputs.scriptName }} -delimitedScriptParameters ${{ github.event.inputs.scriptParameters }}"
+      run: .\RunBootstrapSSMDoc.ps1 -vmName ${{ github.event.inputs.targetEnvironmentName }} -accountID ${{ vars.ACCOUNT_ID }} -fileName package-${{ github.event.inputs.codeArtifactPackageVersion }}.zip -domainOwner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} -nameSpace ${{ vars.CODEARTIFACT_NAMESPACE }} -package ${{ vars.CODEARTIFACT_PACKAGE_NAME }} -packageVersion ${{ github.event.inputs.codeArtifactPackageVersion }} -repository ${{ vars.CODEARTIFACT_REPOSITORY }} -scriptToRun ${{ github.event.inputs.scriptName }} -delimitedScriptParameters "${{ github.event.inputs.scriptParameters }}"
       shell: pwsh    
     
   #  - name: Setup tmate session
