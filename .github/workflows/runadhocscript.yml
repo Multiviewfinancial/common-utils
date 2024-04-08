@@ -32,9 +32,10 @@ on:
         - QAStaging-Windows
         - UE1-DEV-01
       codeArtifactPackageVersion:
-        description: "Version of the CodeArtifact package e.g. 1.0.21 (to be removed once Parameter Store is properly configured for this)"
+        description: "\"latest\", or the specific version of the CodeArtifact package e.g. 1.0.21"
         required: true    
         type: string
+        default: "latest"
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
