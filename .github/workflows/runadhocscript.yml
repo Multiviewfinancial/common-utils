@@ -56,7 +56,7 @@ jobs:
         aws-region: us-east-1
     
     - name: Call Bootstrap SSM Doc
-      run: .\RunBootstrapSSMDoc.ps1 -vmName ${{ github.event.inputs.targetEnvironmentName }} -accountID ${{ vars.ACCOUNT_ID }} -domainOwner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} -nameSpace ${{ vars.CODEARTIFACT_NAMESPACE }} -package ${{ vars.CODEARTIFACT_PACKAGE_NAME }} -packageVersion ${{ github.event.inputs.codeArtifactPackageVersion }} -repository ${{ vars.CODEARTIFACT_REPOSITORY }} -scriptToRun ${{ github.event.inputs.scriptName }} -delimitedScriptParameters "${{ github.event.inputs.scriptParameters }}"
+      run: .\RunBootstrapSSMDoc.ps1 -vmName ${{ github.event.inputs.targetEnvironmentName }} -domainOwner ${{ vars.CODEARTIFACT_DOMAIN_OWNER }} -nameSpace ${{ vars.CODEARTIFACT_NAMESPACE }} -package ${{ vars.CODEARTIFACT_PACKAGE_NAME }} -packageVersion ${{ github.event.inputs.codeArtifactPackageVersion }} -repository ${{ vars.CODEARTIFACT_REPOSITORY }} -scriptToRun ${{ github.event.inputs.scriptName }} -delimitedScriptParameters "${{ github.event.inputs.scriptParameters }}"
       shell: pwsh    
     
   #  - name: Setup tmate session
